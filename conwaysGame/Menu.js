@@ -1,14 +1,14 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useRef, useCallback } from 'react';
 import Grid from './Grid';
-
 import {
   View,
   TouchableHighlight,
   Dimensions,
   StyleSheet,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  SafeAreaView
 } from 'react-native';
 
 const width = Dimensions.get('screen').width;
@@ -23,122 +23,153 @@ const Cell = (props) => {
         height: 35,
         borderWidth: 1,
         backgroundColor: status ? '#38b000' : 'darkslategrey'
-      }}></View>
+      }}
+    />
   );
 };
 
 const App = () => {
+  const [running, setRunning] = useState(false);
+  const [start, setStart] = useState(false);
+  const [autoGame, setAutoGame] = useState(false);
+  const [stopAuto, stopAutoGame] = useState(false);
+  const [changeText, setChangeText] = useState(false);
+
   const [grid, setGrid] = useState(() => {
     return Grid.createEmptyGrid();
   });
 
-  const [running, setRunning] = useState(false);
+  const showBtn = start ? { display: 'flex' } : {};
+
+  const autoBtn = autoGame ? { backgroundColor: 'gray' } : {};
+  const showStop = autoGame ? { display: 'flex' } : {};
+
   const running_ref = useRef(running);
   running_ref.current = running;
 
   const startGame = useCallback(() => {
-    if (!running_ref.current) return;
+    if (!running_ref.current) {
+      return;
+    }
     setGrid((current_grid) => Grid.startGame(current_grid));
     setTimeout(startGame, 100);
   }, []);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        flexDirection: 'row',
-        flexWrap: 'wrap'
-      }}>
-      {grid.map((rows, row_index) =>
-        rows.map((col, col_index) => (
-          <TouchableHighlight
-            key={`${row_index}-${col_index}`}
-            onPress={() => {
-              setGrid(Grid.mutateGrid(grid, row_index, col_index));
-            }}>
-            <Cell row_index={row_index} col_index={col_index} grid={grid} />
-          </TouchableHighlight>
-        ))
-      )}
+    <SafeAreaView style={styles.mainContainer}>
+      <View style={styles.celdsContainer}>
+        {grid.map((rows, row_index) =>
+          rows.map((col, col_index) => (
+            <TouchableHighlight
+              key={`${row_index}-${col_index}`}
+              onPress={() => {
+                setGrid(Grid.mutateGrid(grid, row_index, col_index));
+              }}>
+              <Cell row_index={row_index} col_index={col_index} grid={grid} />
+            </TouchableHighlight>
+          ))
+        )}
+      </View>
+      <View style={styles.btnsContainer}>
+        {/* start */}
+        <TouchableOpacity
+          onPress={() => {
+            setGrid(Grid.randomPath());
+            setStart(!start);
+          }}
+          style={[
+            styles.button,
+            { display: 'flex' },
+            start ? { display: 'none' } : {}
+          ]}>
+          <Text style={{ color: '#fff', fontSize: 20 }}>Start</Text>
+        </TouchableOpacity>
 
-      <View
-        style={{
-          marginTop: 40,
-          marginLeft: 13
-        }}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={{ color: '#fff', fontSize: 20 }}>Start</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={{
-              height: 50,
-              width: width * 0.9,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 10,
-              backgroundColor: '#38b000'
-            }}
-            onPress={() => {
-              setRunning(true);
-              if (!running) {
-                running_ref.current = true;
-                startGame();
-                setRunning(false);
-                running_ref.current = false;
-              }
-            }}>
-            <Text style={{ color: '#fff', fontSize: 20 }}>Next</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              setRunning(true);
-              if (!running) {
-                running_ref.current = true;
-                startGame();
-              }
-            }}>
-            <Text style={{ color: '#fff', fontSize: 20 }}>Auto</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => setGrid(Grid.createEmptyGrid())}>
-            <Text style={{ color: '#fff', fontSize: 20 }}>Reset</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
+        <TouchableOpacity
+          style={[styles.button, showBtn, autoBtn]}
+          disabled={autoGame}
+          onPress={() => {
+            setRunning(true);
+            if (!running) {
+              running_ref.current = true;
+              startGame();
               setRunning(false);
               running_ref.current = false;
-            }}>
-            <Text style={{ color: '#fff', fontSize: 20 }}>Stop</Text>
-          </TouchableOpacity>
-        </View>
+            }
+          }}>
+          <Text style={{ color: '#fff', fontSize: 20 }}>Next</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, showBtn, autoGame ? { display: 'none' } : {}]}
+          onPress={() => {
+            setAutoGame(!autoGame);
+            stopAutoGame(true);
+            setRunning(true);
+            if (!running) {
+              running_ref.current = true;
+              startGame();
+            }
+          }}>
+          <Text style={styles.textBtns}>
+            {!changeText ? 'Auto' : 'Continue'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, showBtn, autoGame ? { display: 'none' } : {}]}
+          onPress={() => {
+            stopAutoGame(false);
+            setChangeText(false);
+            setGrid(Grid.createEmptyGrid());
+            setStart(!start);
+          }}>
+          <Text style={styles.textBtns}>Reset</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, showStop, !stopAuto ? { display: 'none' } : {}]}
+          onPress={() => {
+            setAutoGame(!autoGame);
+            stopAutoGame(false);
+            setChangeText(true);
+            setRunning(false);
+            running_ref.current = false;
+          }}>
+          <Text style={styles.textBtns}>Stop</Text>
+        </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  buttonContainer: {
-    paddingVertical: 10
+  mainContainer: {
+    flex: 1
+  },
+  celdsContainer: {
+    flex: 1.1,
+    flexDirection: 'row',
+    flexWrap: 'wrap'
+  },
+  btnsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   button: {
+    display: 'none',
     height: 50,
     width: width * 0.9,
+    marginVertical: 5,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
     backgroundColor: '#38b000'
+  },
+  textBtns: {
+    color: '#fff',
+    fontSize: 20
   }
 });
 

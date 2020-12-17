@@ -26,6 +26,15 @@ const Grid = {
     });
     return new_grid;
   },
+  randomPath: () => {
+    const rows = [];
+    for (let i = 0; i < num_rows; i++) {
+      rows.push(
+        Array.from(Array(num_cols), () => (Math.random() > 0.8 ? 1 : 0))
+      );
+    }
+    return rows;
+  },
   startGame: (current_grid) => {
     return produce(current_grid, (grid_copy) => {
       for (let i = 0; i < num_rows; i++) {

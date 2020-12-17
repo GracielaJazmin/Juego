@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import React, { useState } from 'react';
 import {
   StyleSheet,
@@ -10,6 +9,7 @@ import {
 
 const width = Dimensions.get('screen').width;
 
+// eslint-disable-next-line react/prop-types
 function StartButton ({ setPagination, pagination }) {
   return (
     <View style={styles.buttonContainer}>
@@ -22,6 +22,7 @@ function StartButton ({ setPagination, pagination }) {
   );
 }
 
+// eslint-disable-next-line react/prop-types
 function NextButton ({ setPagination, pagination, disabled }) {
   return (
     <View style={styles.buttonContainer}>
@@ -43,6 +44,7 @@ function NextButton ({ setPagination, pagination, disabled }) {
   );
 }
 
+// eslint-disable-next-line react/prop-types
 function AutoButton ({ setPagination, pagination }) {
   return (
     <View style={styles.buttonContainer}>
@@ -55,6 +57,7 @@ function AutoButton ({ setPagination, pagination }) {
   );
 }
 
+// eslint-disable-next-line react/prop-types
 function ResetButton ({ setPagination, pagination }) {
   return (
     <View style={styles.buttonContainer}>
@@ -65,20 +68,21 @@ function ResetButton ({ setPagination, pagination }) {
   );
 }
 
+// eslint-disable-next-line react/prop-types
 function StopButton ({ setPagination, pagination }) {
   return (
-    <View style={ styles.buttonContainer }>
+    <View style={styles.buttonContainer}>
       <TouchableOpacity
-        style={ styles.button }
-        onPress={ () => setPagination(pagination + 1) }>
+        style={styles.button}
+        onPress={() => setPagination(pagination + 1)}>
         <Text style={{ color: '#fff', fontSize: 20 }}>Stop</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
-// eslint-disable-next-line no-empty-pattern
-function ContinueButton ({ pagination, setPagination }) {
+// eslint-disable-next-line react/prop-types
+function ContinueButton ({ setPagination, pagination }) {
   return (
     <View style={styles.buttonContainer}>
       <TouchableOpacity
